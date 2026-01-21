@@ -1,0 +1,65 @@
+# Marketplaces to monitor
+marketplaces:
+  - code: DE
+    name: Germany
+    domain: amazon.de
+    currency: EUR
+    vatRate: 0.19
+  - code: FR
+    name: France
+    domain: amazon.fr
+    currency: EUR
+    vatRate: 0.20
+  - code: IT
+    name: Italy
+    domain: amazon.it
+    currency: EUR
+    vatRate: 0.22
+  - code: ES
+    name: Spain
+    domain: amazon.es
+    currency: EUR
+    vatRate: 0.21
+
+# Deal tiers
+dealTiers:
+  low:
+    minMargin: 25
+    maxMargin: 35
+    minRoi: 100
+    maxRoi: 150
+    role: "Low-Margin"
+    color: 0xffff00
+  medium:
+    minMargin: 35
+    maxMargin: 50
+    minRoi: 150
+    maxRoi: 250
+    role: "Medium-Margin"
+    color: 0xffa500
+  high:
+    minMargin: 50
+    minRoi: 250
+    role: "High-Margin"
+    color: 0x00ff00
+
+# Scraper settings
+scraper:
+  timeout: 60000
+  maxRetries: 3
+  useProxies: true
+  rotateUserAgents: true
+  headless: true
+
+# Scheduler settings
+scheduler:
+  cycleIntervalSeconds: 60
+  batchSize: 50
+  maxConcurrentScrapes: 5
+
+# Discord settings
+discord:
+  commandPrefix: "!"
+  enableRolePings: true
+  maxEmbedFields: 10
+  rateLimitPerMinute: 30
