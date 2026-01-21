@@ -20,8 +20,6 @@ export class DiscordBot {
     this.client = new Client({
       intents: [
         GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent,
       ],
     });
 
