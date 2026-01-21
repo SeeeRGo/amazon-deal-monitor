@@ -8,7 +8,7 @@
     "dev": "tsx watch src/index.ts",
     "build": "npx tsc",
     "start": "node dist/index.js",
-    "demo": "npx tsx src/demo.ts",
+    "demo": "npx tsx src/demo.ts --discord",
     "demo:prod": "npm run build && node dist/demo.js",
     "demo:mock": "npx tsx src/demo-mock.ts",
     "demo:mock:prod": "npm run build && node dist/demo-mock.js",
