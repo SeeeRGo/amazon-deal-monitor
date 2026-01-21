@@ -31,9 +31,11 @@ export class DiscordBot {
   }
 
   private setupEventHandlers(): void {
-    this.client.once('ready', () => {
+    this.client.once('ready', async () => {
       logger.info(`Discord bot logged in as ${this.client.user?.tag}`);
-      this.initializeDealsChannel();
+      await this.initializeDealsChannel();
+      // Register slash commands after bot is ready
+      await this.registerCommands();
     });
 
     this.client.on('interactionCreate', async (interaction) => {
@@ -88,9 +90,6 @@ export class DiscordBot {
     try {
       logger.info('Starting Discord bot...');
 
-      // Register slash commands
-      await this.registerCommands();
-
       // Login to Discord
       await this.client.login(this.config.botToken);
 
@@ -115,15 +114,20 @@ export class DiscordBot {
 
       logger.info(`Registering ${commands.length} slash commands...`);
 
+      const clientId = this.client.user?.id;
+      if (!clientId) {
+        throw new Error('Client user ID not available');
+      }
+
       await rest.put(
-        Routes.applicationGuildCommands(this.client.user?.id || '', this.config.guildId),
+        Routes.applicationGuildCommands(clientId, this.config.guildId),
         { body: commands }
       );
 
       logger.info('Slash commands registered successfully');
     } catch (error) {
       logger.error(`Failed to register slash commands: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      throw error;
+      // Don't throw error - allow bot to continue without slash commands
     }
   }
 
