@@ -264,19 +264,60 @@ async function demo() {
     const profitableDeals = tracker.filterDeals({ minProfit: 10 });
     logger.info(`Deals with >€10 profit: ${profitableDeals.length}`);
 
-    // 10. Close Discord bot (if enabled)
+    // 10. Send demo summary to Discord (if enabled)
+    if (discordBot && discordBot.isReady()) {
+      logger.info('\n========================================');
+      logger.info('  Sending Demo Summary to Discord');
+      logger.info('========================================\n');
+
+      const topDeals = tracker.getTopDeals(3, 'margin');
+      const topDealsFormatted = topDeals.map(deal => ({
+        asin: deal.product.asin,
+        title: deal.product.title,
+        margin: deal.metrics.margin,
+        roi: deal.metrics.roi,
+        profit: deal.metrics.profit.toNumber(),
+      }));
+
+      const dealsByTier: Record<string, number> = {
+        low: tracker.getDealsByTier('low').length,
+        medium: tracker.getDealsByTier('medium').length,
+        high: tracker.getDealsByTier('high').length,
+      };
+
+      const dealsByMarketplace: Record<string, number> = {};
+      config.marketplaces.forEach((marketplace) => {
+        dealsByMarketplace[marketplace.code] = tracker.getDealsByMarketplace(marketplace.code).length;
+      });
+
+      const summary = {
+        totalScraped: scrapedProducts.length,
+        totalDeals: tracker.getTrackedDealsCount(),
+        topDeals: topDealsFormatted,
+        dealsByTier,
+        dealsByMarketplace,
+        highMarginCount: highMarginDeals.length,
+        highRoiCount: highRoiDeals.length,
+        profitableCount: profitableDeals.length,
+      };
+
+      await discordBot.sendDemoSummary(summary);
+      logger.info('✓ Demo summary sent to Discord');
+    }
+
+    // 11. Close Discord bot (if enabled)
     if (discordBot) {
       logger.info('\nClosing Discord bot...');
       await discordBot.stop();
       logger.info('✓ Discord bot closed');
     }
 
-    // 11. Close scraper
+    // 12. Close scraper
     logger.info('\nClosing scraper...');
     await scraper.close();
     logger.info('✓ Scraper closed');
 
-    // 12. Summary
+    // 13. Summary
     logger.info('\n========================================');
     logger.info('  Demo Summary');
     logger.info('========================================\n');

@@ -173,6 +173,35 @@ export class DiscordBot {
     }
   }
 
+  async sendDemoSummary(summary: {
+    totalScraped: number;
+    totalDeals: number;
+    topDeals: Array<{ asin: string; title: string; margin: number; roi: number; profit: number }>;
+    dealsByTier: Record<string, number>;
+    dealsByMarketplace: Record<string, number>;
+    highMarginCount: number;
+    highRoiCount: number;
+    profitableCount: number;
+  }): Promise<void> {
+    if (!this.dealsChannel) {
+      logger.warn('Deals channel not initialized, skipping summary');
+      return;
+    }
+
+    try {
+      const embed = DealEmbedBuilder.buildDemoSummaryEmbed(summary);
+
+      await this.dealsChannel.send({
+        content: '📊 **Demo Summary Report**',
+        embeds: [embed],
+      });
+
+      logger.info('Demo summary sent to Discord');
+    } catch (error) {
+      logger.error(`Failed to send demo summary: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+
   getCommandHandler(): CommandHandler {
     return this.commandHandler;
   }

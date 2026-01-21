@@ -213,4 +213,65 @@ export class DealEmbedBuilder {
     ];
     return parts.join('\n');
   }
+
+  static buildDemoSummaryEmbed(summary: {
+    totalScraped: number;
+    totalDeals: number;
+    topDeals: Array<{ asin: string; title: string; margin: number; roi: number; profit: number }>;
+    dealsByTier: Record<string, number>;
+    dealsByMarketplace: Record<string, number>;
+    highMarginCount: number;
+    highRoiCount: number;
+    profitableCount: number;
+  }): EmbedBuilder {
+    const embed = new EmbedBuilder()
+      .setColor(0x00ff00)
+      .setTitle('🎉 Amazon Deal Monitor - Demo Summary')
+      .setDescription('Demo scraping completed successfully!')
+      .addFields(
+        {
+          name: '📊 Scraping Results',
+          value: `Products scraped: **${summary.totalScraped}**\nDeals analyzed: **${summary.totalDeals}**`,
+          inline: false,
+        },
+        {
+          name: '💰 Deal Quality',
+          value: `>40% margin: **${summary.highMarginCount}**\n>200% ROI: **${summary.highRoiCount}**\n>€10 profit: **${summary.profitableCount}**`,
+          inline: true,
+        },
+        {
+          name: '🏷️ Deals by Tier',
+          value: Object.entries(summary.dealsByTier)
+            .map(([tier, count]) => `${tier.toUpperCase()}: **${count}**`)
+            .join('\n'),
+          inline: true,
+        },
+        {
+          name: '🌍 Deals by Marketplace',
+          value: Object.entries(summary.dealsByMarketplace)
+            .map(([marketplace, count]) => `${marketplace}: **${count}**`)
+            .join('\n'),
+          inline: true,
+        }
+      )
+      .setTimestamp();
+
+    // Add top deals if available
+    if (summary.topDeals.length > 0) {
+      const topDealsText = summary.topDeals
+        .slice(0, 3)
+        .map((deal, index) => 
+          `${index + 1}. **${deal.asin}**\n   ${deal.title.substring(0, 50)}...\n   Margin: ${deal.margin.toFixed(1)}% | ROI: ${deal.roi.toFixed(1)}% | Profit: €${deal.profit.toFixed(2)}`
+        )
+        .join('\n\n');
+
+      embed.addFields({
+        name: '🏆 Top Deals by Margin',
+        value: topDealsText,
+        inline: false,
+      });
+    }
+
+    return embed;
+  }
 }
